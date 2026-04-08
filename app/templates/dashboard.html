@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Virgilio v3</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+  <script src="/static/dashboard.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">V</div>
+        <div>
+          <p class="brand-label">Virgilio</p>
+          <p class="brand-subtitle">Gestor de vida</p>
+        </div>
+      </div>
+
+      <div class="sidebar-panel">
+        <p class="label">Hoy</p>
+        <h2 id="today-date">8 de abril de 2026</h2>
+        <p class="muted">Bienvenido de nuevo. Dashboard activo por defecto.</p>
+      </div>
+
+      <nav class="nav-list" aria-label="Navegación principal">
+        <button class="nav-item active" data-view="dashboard">Dashboard</button>
+        <button class="nav-item" data-view="board">Board</button>
+        <button class="nav-item" data-view="list">Lista</button>
+        <button class="nav-item" data-view="timeline">Timeline</button>
+        <button class="nav-item" data-view="habits">Hábitos</button>
+        <button class="nav-item" data-view="finanzas">Finanzas</button>
+      </nav>
+
+      <div class="sidebar-panel streak-card">
+        <p class="label">Racha</p>
+        <div class="streak">
+          <span class="streak-icon">🔥</span>
+          <div>
+            <strong id="streak-days">4 días</strong>
+            <p class="muted">Sesiones activas consecutivas</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="content">
+      <section class="page-header">
+        <div>
+          <p class="breadcrumb">Dashboard / Vista analytics</p>
+          <h1 id="page-title">Dashboard Analytics</h1>
+        </div>
+        <div class="header-actions">
+          <button id="refresh-btn" class="icon-btn" title="Actualizar">⟳</button>
+          <button id="focus-btn" class="secondary-btn">Modo focus</button>
+        </div>
+      </section>
+
+      <section class="toolbar">
+        <div class="search-input">
+          <span>⌘K</span>
+          <input id="search-input" placeholder="Buscar tareas, proyecto o palabra clave" />
+        </div>
+        <div class="quick-filters">
+          <button data-filter="all" class="filter-btn active">Todas</button>
+          <button data-filter="today" class="filter-btn">Solo hoy</button>
+          <button data-filter="no-date" class="filter-btn">Sin fecha</button>
+          <button data-filter="alta" class="filter-btn">Alta</button>
+          <button data-filter="media" class="filter-btn">Media</button>
+          <button data-filter="baja" class="filter-btn">Baja</button>
+        </div>
+      </section>
+
+      <section class="view-panel" id="view-dashboard">
+        <div class="kpi-grid" id="kpi-grid"></div>
+
+        <div class="analytics-grid">
+          <div class="analytics-card stretch" id="load-card">
+            <div class="analytics-card-header"><h2>Carga por categoría</h2></div>
+            <canvas id="category-bar"></canvas>
+          </div>
+          <div class="analytics-card" id="priority-card">
+            <div class="analytics-card-header"><h2>Distribución por prioridad</h2></div>
+            <canvas id="priority-donut"></canvas>
+            <div class="legend" id="priority-legend"></div>
+          </div>
+          <div class="analytics-card heatmap-card" id="heatmap-card">
+            <div class="analytics-card-header"><h2>Actividad últimas 8 semanas</h2></div>
+            <div class="heatmap-grid" id="heatmap-grid"></div>
+            <p class="muted small">Más oscuro = más tareas completadas ese día.</p>
+          </div>
+          <div class="analytics-card" id="radar-card">
+            <div class="analytics-card-header"><h2>Equilibrio de vida</h2></div>
+            <canvas id="balance-radar"></canvas>
+            <p class="muted small">Un radar equilibrado indica atención a todas las áreas de tu vida.</p>
+          </div>
+          <div class="analytics-card" id="trend-card">
+            <div class="analytics-card-header"><h2>Tendencia semanal</h2></div>
+            <canvas id="trend-line"></canvas>
+          </div>
+          <div class="analytics-card overdue-card" id="overdue-card">
+            <div class="analytics-card-header"><h2>Vencidas</h2></div>
+            <div id="overdue-table"></div>
+          </div>
+          <div class="analytics-card alerts-card" id="alerts-card">
+            <div class="analytics-card-header"><h2>Atención</h2></div>
+            <div id="alerts-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view-panel hidden" id="view-board">
+        <div class="board-topbar">
+          <div>
+            <h2>Kanban por categoría</h2>
+            <p class="muted">Arrastra tareas entre columnas y completa con un click.</p>
+          </div>
+          <button id="new-task-btn" class="primary-btn">+ Nueva tarea rápida</button>
+        </div>
+        <div class="board-columns" id="board-columns"></div>
+      </section>
+
+      <section class="view-panel hidden" id="view-list">
+        <div class="empty-state">
+          <h2>Vista Lista</h2>
+          <p>Próximamente: una lista concentrada para ver todo en secuencia.</p>
+        </div>
+      </section>
+
+      <section class="view-panel hidden" id="view-timeline">
+        <div class="empty-state">
+          <h2>Timeline</h2>
+          <p>Próximamente: una línea de tiempo para planificar fechas y entregas.</p>
+        </div>
+      </section>
+
+      <section class="view-panel hidden" id="view-habits">
+        <div class="empty-state">
+          <h2>Hábitos</h2>
+          <p>Próximamente: seguimiento de rutinas y hábitos diarios.</p>
+        </div>
+      </section>
+
+      <section class="view-panel hidden" id="view-finanzas">
+        <div class="empty-state">
+          <h2>Finanzas</h2>
+          <p>Próximamente: análisis simple de tus metas financieras.</p>
+        </div>
+      </section>
+    </main>
+
+    <aside class="right-panel" id="right-panel">
+      <div class="sidebar-panel metrics-card">
+        <p class="label">Top 3 del día</p>
+        <ol id="top3-list" class="top-list"></ol>
+      </div>
+      <div class="sidebar-panel metrics-card">
+        <p class="label">Progreso general</p>
+        <div class="metric-item"><span>Completadas</span><strong id="progress-completed">0</strong></div>
+        <div class="metric-item"><span>Actividades pendientes</span><strong id="progress-pending">0</strong></div>
+        <div class="metric-item"><span>Vencidas</span><strong id="progress-overdue">0</strong></div>
+      </div>
+      <div class="sidebar-panel metrics-card">
+        <p class="label">Atajos</p>
+        <button class="secondary-btn" id="toggle-sidebar">Toggle panel</button>
+        <button class="secondary-btn" id="clear-storage">Reset datos</button>
+      </div>
+    </aside>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <div class="modal hidden" id="task-modal">
+    <div class="modal-backdrop" id="modal-backdrop"></div>
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>Detalle de tarea</h2>
+        <button id="modal-close" class="icon-btn">✕</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+</body>
+</html>
